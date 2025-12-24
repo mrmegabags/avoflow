@@ -19,11 +19,19 @@ defmodule AvoflowWeb.Components.TopBar do
   attr :on_notifications, :string, default: "topbar_notifications"
   attr :on_user_menu, :string, default: "topbar_user_menu"
 
+  # NEW: allow layout to offset the fixed bar and pass global attributes
+  attr :class, :string, default: ""
+  attr :rest, :global
+
   def top_bar(assigns) do
     ~H"""
     <header
       role="banner"
-      class="fixed inset-x-0 top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70"
+      class={
+        "fixed top-0 z-50 h-16 border-b border-gray-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 " <>
+          @class
+      }
+      {@rest}
     >
       <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center gap-3">
@@ -171,9 +179,6 @@ defmodule AvoflowWeb.Components.TopBar do
         <% end %>
       </div>
     </header>
-
-    <!-- Spacer to prevent content from hiding under fixed header -->
-    <div class={if @show_mobile_tip, do: "pt-20 sm:pt-16", else: "pt-16"}></div>
     """
   end
 

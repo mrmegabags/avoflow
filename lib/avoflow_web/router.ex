@@ -28,14 +28,23 @@ defmodule AvoflowWeb.Router do
   scope "/", AvoflowWeb do
     pipe_through :browser
 
+    # lib/avoflow_web/router.ex (inside the appropriate scope/pipeline)
+    live_session :app,
+      on_mount: [{AvoflowWeb.Live.AppShell, :default}],
+      layout: {AvoflowWeb.Layouts, :app} do
+      # Add all your other LiveViews here to inherit Sidebar + TopBar automatically.
+      # live "/batches", AvoflowWeb.BatchesLive, :index
+      live "/dashboard", DashboardLive
+      live "/suppliers", SuppliersLive
+      live "/suppliers/:id", SupplierDetailLive
+      live "/batches", BatchesLive
+      live "/batches/new", BatchIntakeLive
+      live "/batches/:id", BatchesDetailLive
+      live "/inventory", InventoryLive
+      live "/production", ProductionLive
+    end
+
     get "/", PageController, :home
-    live "/dashboard", DashboardLive
-    live "/suppliers", SuppliersLive
-    live "/suppliers/:id", SupplierDetailLive
-    live "/batches", BatchesLive
-    live "/batches/new", BatchIntakeLive
-    live "/batches/:id", BatchesDetailLive
-    live "/inventory", InventoryLive
   end
 
   # Other scopes may use custom stacks.

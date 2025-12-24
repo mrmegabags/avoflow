@@ -1,7 +1,6 @@
 defmodule AvoflowWeb.SuppliersLive do
   use AvoflowWeb, :live_view
 
-  alias AvoflowWeb.Components.TopBar
   import Phoenix.Component
 
   @impl true
@@ -46,8 +45,7 @@ defmodule AvoflowWeb.SuppliersLive do
      assign(socket,
        page_title: "Suppliers",
        q: "",
-       user_label: "User",
-       unread_count: 0,
+       unread_count: 1,
        suppliers: suppliers
      )}
   end
@@ -55,18 +53,8 @@ defmodule AvoflowWeb.SuppliersLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <TopBar.top_bar
-      query={@q}
-      unread_notifications={@unread_count}
-      user_label={@user_label}
-      on_search="topbar_search"
-      on_help="topbar_help"
-      on_notifications="topbar_notifications"
-      on_user_menu="topbar_user_menu"
-    />
-
-    <main class="px-4 sm:px-6 lg:px-8">
-      <div class="mx-auto w-full max-w-6xl py-8 sm:py-10">
+    <main class="">
+      <div class="">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <div>

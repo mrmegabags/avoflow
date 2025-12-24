@@ -4,6 +4,8 @@ defmodule AvoflowWeb.Layouts do
   used by your application.
   """
   use AvoflowWeb, :html
+  alias AvoflowWeb.Components.Sidebar
+  alias AvoflowWeb.Components.TopBar
 
   # Embed all files in layouts/* within this module.
   # The default root.html.heex file contains the HTML
@@ -11,64 +13,43 @@ defmodule AvoflowWeb.Layouts do
   # and other static content.
   embed_templates "layouts/*"
 
-  @doc """
-  Renders your app layout.
-
-  This function is typically invoked from every template,
-  and it often contains your application menu, sidebar,
-  or similar.
-
-  ## Examples
-
-      <Layouts.app flash={@flash}>
-        <h1>Content</h1>
-      </Layouts.app>
-
-  """
-  attr :flash, :map, required: true, doc: "the map of flash messages"
-
-  attr :current_scope, :map,
-    default: nil,
-    doc: "the current [scope](https://hexdocs.pm/phoenix/scopes.html)"
-
-  slot :inner_block, required: true
-
   def app(assigns) do
+    assigns =
+      assigns
+      |> assign(:navigation, Map.get(assigns, :navigation, []))
+      |> assign(:user, Map.get(assigns, :user, %{initials: "", name: "", role: ""}))
+      |> assign(:q, Map.get(assigns, :q, ""))
+      |> assign(:unread_count, Map.get(assigns, :unread_count, 0))
+      |> assign(:user_label, Map.get(assigns, :user_label, ""))
+      |> assign(:current_path, Map.get(assigns, :current_path, "/"))
+
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8">
-      <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          <img src={~p"/images/logo.svg"} width="36" />
-          <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
-        </a>
-      </div>
-      <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
-          </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
-          </li>
-          <li>
-            <.theme_toggle />
-          </li>
-          <li>
-            <a href="https://hexdocs.pm/phoenix/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </header>
+    <div class="min-h-screen bg-gray-50">
+      <Sidebar.sidebar navigation={@navigation} current_path={@current_path} user={@user} />
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
-        {render_slot(@inner_block)}
+      <div class="lg:pl-60">
+        <TopBar.top_bar
+          class="left-0 right-0 lg:left-60"
+          query={@q}
+          unread_notifications={@unread_count}
+          user_label={@user_label}
+          on_search="topbar_search"
+          on_help="topbar_help"
+          on_notifications="topbar_notifications"
+          on_user_menu="topbar_user_menu"
+        />
+        
+    <!-- Fixed top bar spacer (contract rule) -->
+        <div class="pt-16">
+          <main>
+            <!-- Contract container + vertical rhythm -->
+            <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+              {@inner_content}
+            </div>
+          </main>
+        </div>
       </div>
-    </main>
-
-    <.flash_group flash={@flash} />
+    </div>
     """
   end
 
