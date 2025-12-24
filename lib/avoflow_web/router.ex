@@ -41,7 +41,8 @@ defmodule AvoflowWeb.Router do
       live "/batches/new", BatchIntakeLive
       live "/batches/:id", BatchesDetailLive
       live "/inventory", InventoryLive
-      live "/production", ProductionLive
+      live "/production", ProductionLive, :new
+      live "/production/runs", ProductionLive, :runs
     end
 
     get "/", PageController, :home

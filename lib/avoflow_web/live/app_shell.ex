@@ -8,7 +8,7 @@ defmodule AvoflowWeb.Live.AppShell do
     %{name: "Suppliers", href: "/suppliers"},
     %{name: "Batches", href: "/batches"},
     %{name: "Inventory", href: "/inventory"},
-    %{name: "Production", href: "/production"}
+    %{name: "New Production", href: "/production"}
   ]
 
   @user %{initials: "JD", name: "John Doe", role: "Plant Manager"}
