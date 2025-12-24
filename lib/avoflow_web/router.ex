@@ -8,16 +8,34 @@ defmodule AvoflowWeb.Router do
     plug :put_root_layout, html: {AvoflowWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :snoop
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
+  def snoop(conn, _opts) do
+    answer = ~w(Yes No Maybe) |> Enum.random()
+
+    conn = assign(conn, :answer, answer)
+
+    # IO.inspect(conn)
+
+    conn
+  end
+
   scope "/", AvoflowWeb do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/dashboard", DashboardLive
+    live "/suppliers", SuppliersLive
+    live "/suppliers/:id", SupplierDetailLive
+    live "/batches", BatchesLive
+    live "/batches/new", BatchIntakeLive
+    live "/batches/:id", BatchesDetailLive
+    live "/inventory", InventoryLive
   end
 
   # Other scopes may use custom stacks.
