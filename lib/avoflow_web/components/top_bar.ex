@@ -19,22 +19,31 @@ defmodule AvoflowWeb.Components.TopBar do
   attr :on_notifications, :string, default: "topbar_notifications"
   attr :on_user_menu, :string, default: "topbar_user_menu"
 
-  # NEW: allow layout to offset the fixed bar and pass global attributes
+  # Allow the layout to offset the fixed bar (e.g. lg:left-60) and pass global attrs
   attr :class, :string, default: ""
   attr :rest, :global
+
+  # Slot for a left control (e.g. mobile menu button)
+  slot :left
 
   def top_bar(assigns) do
     ~H"""
     <header
       role="banner"
       class={
-        "fixed top-0 z-50 h-16 border-b border-gray-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 " <>
+        "fixed inset-x-0 top-0 z-50 h-16 border-b border-gray-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 " <>
           @class
       }
       {@rest}
     >
       <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center gap-3">
+          <%= if @left != [] do %>
+            <div class="flex items-center">
+              {render_slot(@left)}
+            </div>
+          <% end %>
+
           <form class="min-w-0 flex-1" role="search" aria-label="Site search" phx-submit={@on_search}>
             <div class="relative">
               <label for="topbar-search" class="sr-only">Search</label>

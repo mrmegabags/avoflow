@@ -22,14 +22,90 @@ defmodule AvoflowWeb.Layouts do
       |> assign(:unread_count, Map.get(assigns, :unread_count, 0))
       |> assign(:user_label, Map.get(assigns, :user_label, ""))
       |> assign(:current_path, Map.get(assigns, :current_path, "/"))
+      |> assign(:mobile_nav_open, Map.get(assigns, :mobile_nav_open, false))
 
     ~H"""
     <div class="min-h-screen bg-gray-50">
       <Sidebar.sidebar navigation={@navigation} current_path={@current_path} user={@user} />
+      
+    <!-- Mobile drawer -->
+      <%= if @mobile_nav_open do %>
+        <div
+          class="fixed inset-0 z-40 lg:hidden"
+          phx-window-keydown="nav_keydown"
+        >
+          <!-- Overlay (click to close) -->
+          <button
+            type="button"
+            phx-click="nav_close"
+            aria-label="Close navigation menu"
+            class="absolute inset-0 bg-black/30 focus:outline-none"
+          >
+          </button>
+          
+    <!-- Drawer -->
+          <div class="absolute left-0 top-0 h-full w-72 bg-[#1A1C1E] text-white shadow-xl">
+            <div class="h-16 flex items-center justify-between px-4 border-b border-gray-800">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-[#2E7D32] rounded-lg flex items-center justify-center">
+                  <span class="font-bold text-white">A</span>
+                </div>
+                <span class="font-bold text-lg tracking-tight">AvoFlow</span>
+              </div>
+
+              <button
+                type="button"
+                phx-click="nav_close"
+                aria-label="Close navigation menu"
+                class="rounded-full p-2 text-gray-300 hover:bg-white/10 hover:text-white
+                       focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2E7D32]/30"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <nav class="py-6 px-3 space-y-1 overflow-y-auto h-[calc(100%-4rem)]">
+              <%= for item <- @navigation do %>
+                <.link
+                  navigate={nav_path(item.href)}
+                  phx-click="nav_close"
+                  class={
+                    [
+                      "flex items-center px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200",
+                      "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2E7D32]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A1C1E]",
+                      if(String.starts_with?((@current_path || "/") <> "/", item.href <> "/"),
+                        do: "bg-[#2E7D32] text-white shadow-md translate-x-1",
+                        else: "text-gray-400 hover:text-white hover:bg-white/5"
+                      )
+                    ]
+                    |> Enum.join(" ")
+                  }
+                >
+                  <span class="w-5 h-5 mr-3 flex-shrink-0"></span>
+                  {item.name}
+                </.link>
+              <% end %>
+            </nav>
+          </div>
+        </div>
+      <% end %>
 
       <div class="lg:pl-60">
         <TopBar.top_bar
-          class="left-0 right-0 lg:left-60"
+          class="lg:left-60"
           query={@q}
           unread_notifications={@unread_count}
           user_label={@user_label}
@@ -37,12 +113,38 @@ defmodule AvoflowWeb.Layouts do
           on_help="topbar_help"
           on_notifications="topbar_notifications"
           on_user_menu="topbar_user_menu"
-        />
+        >
+          <:left>
+            <!-- Mobile menu button -->
+            <button
+              type="button"
+              phx-click="nav_open"
+              aria-label="Open navigation menu"
+              class="lg:hidden inline-flex items-center justify-center rounded-full p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900
+                     focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2E7D32]/30"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="4" y1="6" x2="20" y2="6"></line>
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+                <line x1="4" y1="18" x2="20" y2="18"></line>
+              </svg>
+            </button>
+          </:left>
+        </TopBar.top_bar>
         
     <!-- Fixed top bar spacer (contract rule) -->
         <div class="pt-16">
           <main>
-            <!-- Contract container + vertical rhythm -->
             <div class="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
               {@inner_content}
             </div>
@@ -52,6 +154,15 @@ defmodule AvoflowWeb.Layouts do
     </div>
     """
   end
+
+  # Keep these helper functions somewhere in the same module (Layouts).
+  # If you already have them, do not duplicate.
+  defp nav_path("/"), do: ~p"/"
+  defp nav_path("/suppliers"), do: ~p"/suppliers"
+  defp nav_path("/batches"), do: ~p"/batches"
+  defp nav_path("/inventory"), do: ~p"/inventory"
+  defp nav_path("/production"), do: ~p"/production"
+  defp nav_path(other) when is_binary(other), do: other
 
   @doc """
   Shows the flash group with standard titles and content.

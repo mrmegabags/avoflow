@@ -19,9 +19,10 @@ defmodule AvoflowWeb.Live.AppShell do
       |> ensure_assign(:navigation, fn -> @navigation end)
       |> ensure_assign(:user, fn -> @user end)
       |> ensure_assign(:q, fn -> "" end)
-      |> ensure_assign(:unread_count, fn -> 3 end)
+      |> ensure_assign(:unread_count, fn -> 0 end)
       |> ensure_assign(:user_label, fn -> @user.name end)
       |> ensure_assign(:current_path, fn -> "/" end)
+      |> ensure_assign(:mobile_nav_open, fn -> false end)
 
     socket =
       Phoenix.LiveView.attach_hook(socket, :set_current_path, :handle_params, fn _params,
@@ -32,20 +33,39 @@ defmodule AvoflowWeb.Live.AppShell do
       end)
 
     socket =
-      Phoenix.LiveView.attach_hook(socket, :topbar_events, :handle_event, fn event,
-                                                                             params,
-                                                                             socket ->
+      Phoenix.LiveView.attach_hook(socket, :app_shell_events, :handle_event, fn event,
+                                                                                params,
+                                                                                socket ->
         case {event, params} do
+          # TopBar search (supports both payload shapes)
+          {"topbar_search", %{"q" => q}} when is_binary(q) ->
+            {:halt, assign(socket, :q, q)}
+
           {"topbar_search", %{"query" => q}} when is_binary(q) ->
             {:halt, assign(socket, :q, q)}
 
-          {"topbar_clear_search", _} ->
-            {:halt, assign(socket, :q, "")}
+          # Mobile nav
+          {"nav_open", _} ->
+            {:halt, assign(socket, :mobile_nav_open, true)}
 
-          {"topbar_open_notifications", _} ->
+          {"nav_close", _} ->
+            {:halt, assign(socket, :mobile_nav_open, false)}
+
+          # Escape closes drawer (phx-window-keydown)
+          {"nav_keydown", %{"key" => "Escape"}} ->
+            {:halt, assign(socket, :mobile_nav_open, false)}
+
+          {"nav_keydown", %{"key" => "Esc"}} ->
+            {:halt, assign(socket, :mobile_nav_open, false)}
+
+          # Keep other topbar events as no-ops by default
+          {"topbar_help", _} ->
             {:halt, socket}
 
-          {"topbar_open_profile", _} ->
+          {"topbar_notifications", _} ->
+            {:halt, socket}
+
+          {"topbar_user_menu", _} ->
             {:halt, socket}
 
           _ ->
