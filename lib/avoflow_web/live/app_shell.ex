@@ -4,11 +4,31 @@ defmodule AvoflowWeb.Live.AppShell do
   import Phoenix.Component, only: [assign: 3]
 
   @navigation [
+    # Core
     %{name: "Dashboard", href: "/dashboard"},
+
+    # Supply & Intake
     %{name: "Suppliers", href: "/suppliers"},
     %{name: "Batches", href: "/batches"},
+
+    # Inventory
     %{name: "Inventory", href: "/inventory"},
-    %{name: "New Production", href: "/production"}
+    %{name: "Stock Ledger", href: "/stock-ledger"},
+    %{name: "Cycle Counts", href: "/cycle-counts"},
+    %{name: "Holds & Quarantine", href: "/holds-quarantine"},
+
+    # Production
+    %{name: "New Production Run", href: "/production"},
+
+    # Finished Goods
+    %{name: "Finished Goods", href: "/finished-goods"},
+
+    # Quality & Compliance
+    %{name: "HACCP Logs", href: "/haccp/logs"},
+
+    # System
+    %{name: "Integrations", href: "/integrations"},
+    %{name: "Settings", href: "/settings"}
   ]
 
   @user %{initials: "JD", name: "John Doe", role: "Plant Manager"}

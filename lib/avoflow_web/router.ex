@@ -43,6 +43,19 @@ defmodule AvoflowWeb.Router do
       live "/inventory", InventoryLive
       live "/production", ProductionLive, :new
       live "/production/runs", ProductionLive, :runs
+      live "/finished-goods", FinishedGoodsDashboardLive
+      live "/finished-goods/pack", PackFinishedGoodsLive
+      live "/stock-ledger", StockLedgerLive
+      live "/finished-goods/fulfill", PickPackShipLive, :index
+      live "/finished-goods/fulfill/:order_id", PickPackShipLive, :show
+      live "/finished-goods/shipped", ShippedOrdersLive, :index
+      live "/finished-goods/shipped/:order_id", ShippedOrdersLive, :show
+      live "/finished-goods/adjustments", AdjustmentsLive, :index
+      live "/cycle-counts", CycleCountsLive, :index
+      live "/holds-quarantine", HoldsQuarantineLive, :index
+      live "/integrations", IntegrationsLive, :index
+      live "/haccp/logs", HACCPLogsLive, :index
+      live "/settings", SettingsLive, :index
     end
 
     get "/", PageController, :home

@@ -86,6 +86,7 @@ defmodule AvoflowWeb do
       import Phoenix.HTML
       # Core UI components
       import AvoflowWeb.CoreComponents
+      import AvoflowWeb.CustomComponents
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS
